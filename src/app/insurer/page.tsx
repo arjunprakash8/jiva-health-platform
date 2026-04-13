@@ -7,7 +7,6 @@ import {
   Area,
   BarChart,
   Bar,
-  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -17,7 +16,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
   ComposedChart,
   ReferenceLine,
 } from "recharts";
@@ -50,7 +48,6 @@ import {
   tierDistribution,
   pilotKPIs,
   premiumAdjustments,
-  patientRoster,
 } from "@/lib/mockData";
 
 // ─── KPI Card ─────────────────────────────────────────────────────────────────
@@ -520,7 +517,7 @@ export default function InsurerDashboard() {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                       <XAxis dataKey="month" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                       <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} domain={[40, 110]} />
-                      <Tooltip contentStyle={{ borderRadius: "12px", border: "none", fontSize: "11px" }} formatter={(v: number | null, n: string) => [v != null ? `${v}` : "—", n === "actual" ? "Actual" : "Projected"]} />
+                      <Tooltip contentStyle={{ borderRadius: "12px", border: "none", fontSize: "11px" }} formatter={(v: number | string, n: string) => [v != null ? `${v}` : "—", n === "actual" ? "Actual" : "Projected"]} />
                       <Area type="monotone" dataKey="actual" stroke="#7c3aed" strokeWidth={2.5} fill="#7c3aed20" name="actual" connectNulls />
                       <Line type="monotone" dataKey="projected" stroke="#a78bfa" strokeWidth={2} strokeDasharray="6 3" name="projected" dot={false} />
                       <ReferenceLine y={100} stroke="#94a3b8" strokeDasharray="3 3" />

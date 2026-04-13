@@ -5,10 +5,6 @@ import Link from "next/link";
 import {
   BarChart,
   Bar,
-  AreaChart,
-  Area,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -27,7 +23,6 @@ import {
   Filter,
   AlertCircle,
   AlertTriangle,
-  Info,
   ChevronRight,
   Users,
   TrendingUp,
@@ -45,17 +40,12 @@ import {
   Clock,
   Stethoscope,
   RefreshCw,
-  MoreVertical,
 } from "lucide-react";
 import {
   patientRoster,
-  heartRateTrend,
-  spo2Trend,
-  hrvTrend,
   populationRiskDistribution,
   getRiskColor,
   getScoreColor,
-  getScoreLabel,
   Patient,
 } from "@/lib/mockData";
 
