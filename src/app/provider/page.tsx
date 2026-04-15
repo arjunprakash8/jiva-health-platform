@@ -3,227 +3,29 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from "recharts";
 import {
-  Activity,
-  ArrowLeft,
-  Bell,
-  Search,
-  Filter,
-  AlertCircle,
-  AlertTriangle,
-  ChevronRight,
-  Users,
-  TrendingUp,
-  Download,
-  FileText,
-  Video,
-  Heart,
-  Droplets,
-  Thermometer,
-  Wind,
-  Footprints,
-  Moon,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Stethoscope,
-  RefreshCw,
+  Activity, ArrowLeft, Bell, Search, Filter, AlertCircle,
+  AlertTriangle, ChevronRight, Users, TrendingUp, Download,
+  FileText, Video, Heart, Droplets, Thermometer, Wind,
+  Footprints, Moon, CheckCircle, XCircle, Clock, Stethoscope, RefreshCw,
 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
-  patientRoster,
-  populationRiskDistribution,
-  getRiskColor,
-  getScoreColor,
-  Patient,
+  patientRoster, populationRiskDistribution,
+  getRiskColor, getScoreColor, Patient,
 } from "@/lib/mockData";
 
-// ─── Mini Health Score Badge ───────────────────────────────────────────────────
-function ScoreBadge({ score }: { score: number }) {
-  const color = getScoreColor(score);
-  return (
-    <div
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
-      style={{ backgroundColor: color + "18", color }}
-    >
-      <span
-        className="w-1.5 h-1.5 rounded-full"
-        style={{ backgroundColor: color }}
-      />
-      {score}
-    </div>
-  );
-}
-
-// ─── Risk Badge ────────────────────────────────────────────────────────────────
-function RiskBadge({ risk }: { risk: string }) {
-  const configs = {
-    high:     { bg: "bg-red-100", text: "text-red-700", label: "High Risk", dot: "bg-red-500" },
-    moderate: { bg: "bg-amber-100", text: "text-amber-700", label: "Moderate", dot: "bg-amber-500" },
-    low:      { bg: "bg-emerald-100", text: "text-emerald-700", label: "Low Risk", dot: "bg-emerald-500" },
-  };
-  const c = configs[risk as keyof typeof configs] ?? configs.low;
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${c.bg} ${c.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${c.dot} ${risk === "high" ? "animate-pulse" : ""}`} />
-      {c.label}
-    </span>
-  );
-}
-
-// ─── Alert Badge ───────────────────────────────────────────────────────────────
-function AlertCount({ alerts }: { alerts: { type: string; resolved: boolean }[] }) {
-  const active = alerts.filter((a) => !a.resolved);
-  if (active.length === 0)
-    return <span className="text-xs text-slate-400 flex items-center gap-1"><CheckCircle className="w-3 h-3 text-emerald-400" /> Clear</span>;
-  const critical = active.filter((a) => a.type === "critical").length;
-  return (
-    <div className="flex items-center gap-1">
-      {critical > 0 && (
-        <span className="flex items-center gap-1 bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
-          <AlertCircle className="w-3 h-3" /> {critical}
-        </span>
-      )}
-      {active.length - critical > 0 && (
-        <span className="flex items-center gap-1 bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">
-          <AlertTriangle className="w-3 h-3" /> {active.length - critical}
-        </span>
-      )}
-    </div>
-  );
-}
-
-// ─── Patient Detail Panel ──────────────────────────────────────────────────────
-function PatientDetailPanel({ patient }: { patient: Patient }) {
-  const vitalRows = [
-    { icon: Heart, label: "Heart Rate", value: `${patient.heartRate} bpm`, color: "#ef4444", sub: patient.heartRate > 85 ? "⚠ Elevated" : "Normal" },
-    { icon: Droplets, label: "SpO₂", value: `${patient.spo2}%`, color: "#3b82f6", sub: patient.spo2 < 95 ? "⚠ Low" : "Normal" },
-    { icon: Wind, label: "HRV (RMSSD)", value: `${patient.hrv} ms`, color: "#8b5cf6", sub: patient.hrv < 25 ? "⚠ Low" : "Normal" },
-    { icon: Thermometer, label: "Skin Temp", value: `${patient.temperature}°C`, color: "#f59e0b", sub: patient.temperature > 37.2 ? "⚠ Elevated" : "Normal" },
-    { icon: Footprints, label: "Steps", value: patient.steps.toLocaleString(), color: "#10b981", sub: `${Math.round(patient.steps / 100)}% goal` },
-    { icon: Moon, label: "Sleep Score", value: `${patient.sleepScore}/100`, color: "#6366f1", sub: patient.sleepScore < 60 ? "Poor" : "Good" },
-  ];
-
-  return (
-    <div className="flex flex-col gap-4 h-full">
-      {/* Patient header */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 text-white">
-        <div className="flex items-start justify-between mb-3">
-          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-bold">
-            {patient.name.split(" ").map((n) => n[0]).join("")}
-          </div>
-          <RiskBadge risk={patient.riskLevel} />
-        </div>
-        <h3 className="text-lg font-bold">{patient.name}</h3>
-        <p className="text-blue-200 text-sm">{patient.age}y · {patient.gender} · {patient.id}</p>
-        <p className="text-blue-200 text-xs mt-1">{patient.condition.join(", ")}</p>
-        <div className="flex items-center gap-3 mt-4">
-          <div className="text-center">
-            <p className="text-2xl font-extrabold" style={{ color: getScoreColor(patient.healthScore) }}>
-              {patient.healthScore}
-            </p>
-            <p className="text-blue-200 text-xs">Health Score</p>
-          </div>
-          <div className="w-px h-10 bg-white/20" />
-          <div className="text-center">
-            <p className="text-2xl font-extrabold text-white">{patient.activityCompliance}%</p>
-            <p className="text-blue-200 text-xs">Compliance</p>
-          </div>
-          <div className="w-px h-10 bg-white/20" />
-          <div className="text-center">
-            <p className="text-2xl font-extrabold text-white">{patient.ringBattery}%</p>
-            <p className="text-blue-200 text-xs">Ring Battery</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Vitals grid */}
-      <div className="grid grid-cols-2 gap-2">
-        {vitalRows.map((v) => (
-          <div key={v.label} className="bg-white rounded-xl p-3 border border-slate-100 shadow-sm">
-            <div className="flex items-center gap-1.5 mb-1">
-              <v.icon className="w-3.5 h-3.5" style={{ color: v.color }} />
-              <span className="text-xs text-slate-500">{v.label}</span>
-            </div>
-            <p className="text-base font-bold text-slate-900">{v.value}</p>
-            <p
-              className="text-xs font-medium"
-              style={{ color: v.sub.startsWith("⚠") ? "#ef4444" : "#10b981" }}
-            >
-              {v.sub}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Alerts */}
-      {patient.alerts.filter((a) => !a.resolved).length > 0 && (
-        <div className="space-y-2">
-          <p className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Active Alerts</p>
-          {patient.alerts
-            .filter((a) => !a.resolved)
-            .map((alert) => (
-              <div
-                key={alert.id}
-                className={`p-3 rounded-xl border text-xs ${
-                  alert.type === "critical"
-                    ? "bg-red-50 border-red-200"
-                    : alert.type === "warning"
-                    ? "bg-amber-50 border-amber-200"
-                    : "bg-blue-50 border-blue-200"
-                }`}
-              >
-                <div className="flex items-start gap-2">
-                  <AlertCircle
-                    className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${
-                      alert.type === "critical" ? "text-red-600" : "text-amber-600"
-                    }`}
-                  />
-                  <div>
-                    <p
-                      className={`font-semibold ${
-                        alert.type === "critical" ? "text-red-700" : "text-amber-700"
-                      }`}
-                    >
-                      {alert.message}
-                    </p>
-                    {alert.vitals && <p className="text-slate-500 mt-0.5">{alert.vitals}</p>}
-                    <p className="text-slate-400 mt-0.5">{alert.timestamp}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="grid grid-cols-2 gap-2 mt-auto">
-        <button className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors">
-          <Video className="w-4 h-4" /> Teleconsult
-        </button>
-        <button className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold hover:bg-slate-200 transition-colors">
-          <FileText className="w-4 h-4" /> Referral
-        </button>
-        <button className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm hover:bg-slate-50 transition-colors col-span-2">
-          <Download className="w-4 h-4" /> Export FHIR Data
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── Alert trend data ──────────────────────────────────────────────────────────
 const alertTrend = [
   { day: "Mon", critical: 3, warning: 7 },
   { day: "Tue", critical: 5, warning: 9 },
@@ -234,331 +36,408 @@ const alertTrend = [
   { day: "Sun", critical: 3, warning: 7 },
 ];
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
+function RiskBadge({ risk }: { risk: string }) {
+  const map: Record<string, { variant: "danger" | "warning" | "success"; label: string }> = {
+    high:     { variant: "danger",  label: "High Risk" },
+    moderate: { variant: "warning", label: "Moderate" },
+    low:      { variant: "success", label: "Low Risk" },
+  };
+  const c = map[risk] ?? map.low;
+  return (
+    <Badge variant={c.variant} className="flex items-center gap-1">
+      <span className={`w-1.5 h-1.5 rounded-full ${risk === "high" ? "animate-pulse" : ""}`}
+        style={{ backgroundColor: risk === "high" ? "#ef4444" : risk === "moderate" ? "#f59e0b" : "#10b981" }} />
+      {c.label}
+    </Badge>
+  );
+}
+
+function ScorePill({ score }: { score: number }) {
+  const color = getScoreColor(score);
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border"
+      style={{ backgroundColor: color + "15", color, borderColor: color + "30" }}>
+      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />{score}
+    </span>
+  );
+}
+
+function PatientDetail({ patient }: { patient: Patient }) {
+  const vitals = [
+    { icon: Heart, label: "Heart Rate", value: `${patient.heartRate} bpm`, color: "#ef4444", warn: patient.heartRate > 85 },
+    { icon: Droplets, label: "SpO₂", value: `${patient.spo2}%`, color: "#3b82f6", warn: patient.spo2 < 95 },
+    { icon: Wind, label: "HRV (RMSSD)", value: `${patient.hrv} ms`, color: "#8b5cf6", warn: patient.hrv < 25 },
+    { icon: Thermometer, label: "Skin Temp", value: `${patient.temperature}°C`, color: "#f59e0b", warn: patient.temperature > 37.2 },
+    { icon: Footprints, label: "Steps", value: patient.steps.toLocaleString(), color: "#10b981", warn: false },
+    { icon: Moon, label: "Sleep Score", value: `${patient.sleepScore}/100`, color: "#6366f1", warn: patient.sleepScore < 60 },
+  ];
+
+  const activeAlerts = patient.alerts.filter(a => !a.resolved);
+
+  return (
+    <div className="space-y-5">
+      {/* Patient header */}
+      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl p-5 text-white">
+        <div className="flex items-start justify-between mb-3">
+          <Avatar className="h-12 w-12">
+            <AvatarFallback className="bg-white/20 text-white font-bold">
+              {patient.name.split(" ").map(n => n[0]).join("")}
+            </AvatarFallback>
+          </Avatar>
+          <RiskBadge risk={patient.riskLevel} />
+        </div>
+        <h3 className="text-lg font-bold">{patient.name}</h3>
+        <p className="text-blue-200 text-sm">{patient.age}y · {patient.gender} · {patient.id}</p>
+        <p className="text-blue-200 text-xs mt-1">{patient.condition.join(", ")}</p>
+        <div className="flex items-center gap-5 mt-4">
+          {[
+            { label: "Health Score", val: patient.healthScore, color: getScoreColor(patient.healthScore) },
+            { label: "Compliance", val: `${patient.activityCompliance}%`, color: "white" },
+            { label: "Battery", val: `${patient.ringBattery}%`, color: "white" },
+          ].map((s, i) => (
+            <div key={i} className="text-center">
+              <p className="text-2xl font-extrabold" style={{ color: typeof s.color === "string" ? s.color : "#fff" }}>{s.val}</p>
+              <p className="text-blue-200 text-xs">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Vitals */}
+      <div className="grid grid-cols-2 gap-2">
+        {vitals.map(v => (
+          <Card key={v.label} className={v.warn ? "border-destructive/40" : ""}>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-1.5 mb-1">
+                <v.icon className="w-3.5 h-3.5" style={{ color: v.color }} />
+                <span className="text-xs text-muted-foreground">{v.label}</span>
+              </div>
+              <p className="text-base font-bold">{v.value}</p>
+              {v.warn && <p className="text-xs font-medium text-destructive mt-0.5">⚠ Elevated</p>}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Alerts */}
+      {activeAlerts.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Active Alerts</p>
+          {activeAlerts.map(alert => (
+            <Alert key={alert.id} variant={alert.type === "critical" ? "destructive" : "warning"}>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                <p className="font-semibold text-xs">{alert.message}</p>
+                {alert.vitals && <p className="text-xs mt-0.5 opacity-80">{alert.vitals}</p>}
+                <p className="text-xs mt-0.5 opacity-60">{alert.timestamp}</p>
+              </AlertDescription>
+            </Alert>
+          ))}
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="grid grid-cols-2 gap-2">
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Video className="w-4 h-4" /> Teleconsult
+        </Button>
+        <Button variant="outline">
+          <FileText className="w-4 h-4" /> Referral
+        </Button>
+        <Button variant="outline" className="col-span-2">
+          <Download className="w-4 h-4" /> Export FHIR Data
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function ProviderDashboard() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [riskFilter, setRiskFilter] = useState<"all" | "high" | "moderate" | "low">("all");
 
-  const allAlerts = patientRoster.flatMap((p) =>
-    p.alerts.filter((a) => !a.resolved).map((a) => ({ ...a, patientName: p.name, patientId: p.id }))
+  const allAlerts = patientRoster.flatMap(p =>
+    p.alerts.filter(a => !a.resolved).map(a => ({ ...a, patientName: p.name, patientId: p.id }))
   );
-  const criticalAlerts = allAlerts.filter((a) => a.type === "critical");
+  const criticalAlerts = allAlerts.filter(a => a.type === "critical");
 
-  const filteredPatients = patientRoster.filter((p) => {
-    const matchSearch =
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredPatients = patientRoster.filter(p => {
+    const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.condition.some((c) => c.toLowerCase().includes(searchQuery.toLowerCase()));
+      p.condition.some(c => c.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchRisk = riskFilter === "all" || p.riskLevel === riskFilter;
     return matchSearch && matchRisk;
   });
 
-  const highRiskCount = patientRoster.filter((p) => p.riskLevel === "high").length;
+  const highRiskCount = patientRoster.filter(p => p.riskLevel === "high").length;
   const avgScore = Math.round(patientRoster.reduce((s, p) => s + p.healthScore, 0) / patientRoster.length);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Nav */}
-      <nav className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-30 shadow-sm">
+      <nav className="bg-card border-b px-6 py-3.5 sticky top-0 z-30 shadow-sm">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-1.5 text-slate-400 hover:text-slate-600 transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm">Back</span>
-            </Link>
-            <div className="w-px h-5 bg-slate-200" />
+            <Button variant="ghost" size="sm" asChild className="text-muted-foreground">
+              <Link href="/"><ArrowLeft className="w-4 h-4" /> Back</Link>
+            </Button>
+            <Separator orientation="vertical" className="h-5" />
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                 <Stethoscope className="w-4 h-4 text-white" />
               </div>
-              <div>
-                <span className="font-bold text-slate-900 text-sm">JIVA</span>
-                <span className="text-slate-400 text-sm"> · Provider Dashboard</span>
-              </div>
+              <span className="font-bold text-sm">JIVA</span>
+              <span className="text-muted-foreground text-sm">· Provider Dashboard</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="hidden md:flex items-center gap-1.5 text-xs text-slate-500">
+          <div className="flex items-center gap-3">
+            <span className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground">
               <RefreshCw className="w-3 h-3" /> Live · auto-refresh 30s
             </span>
-            <button className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
-              <Bell className="w-4 h-4 text-slate-600" />
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="w-4 h-4" />
               {criticalAlerts.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center font-bold animate-pulse">
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-destructive rounded-full text-white text-xs flex items-center justify-center font-bold animate-pulse">
                   {criticalAlerts.length}
                 </span>
               )}
-            </button>
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold">
-                DR
-              </div>
-              <div className="hidden md:block">
-                <p className="text-sm font-semibold text-slate-900">Dr. Rebecca Owusu</p>
-                <p className="text-xs text-slate-500">JIVA Clinical Team · Nairobi</p>
-              </div>
+            </Button>
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xs font-bold">DR</AvatarFallback>
+            </Avatar>
+            <div className="hidden md:block">
+              <p className="text-sm font-semibold leading-tight">Dr. Rebecca Owusu</p>
+              <p className="text-xs text-muted-foreground">JIVA Clinical · Nairobi</p>
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
-        {/* KPI row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-6 space-y-5">
+        {/* KPIs */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: "Total Patients", value: patientRoster.length, icon: Users, color: "#3b82f6", sub: "Pilot cohort" },
             { label: "High Risk", value: highRiskCount, icon: AlertCircle, color: "#ef4444", sub: "Require attention", pulse: true },
             { label: "Active Alerts", value: allAlerts.length, icon: Bell, color: "#f59e0b", sub: `${criticalAlerts.length} critical` },
             { label: "Avg Health Score", value: avgScore, icon: Activity, color: "#10b981", sub: "Moderate range" },
-          ].map((kpi) => (
-            <div key={kpi.label} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 card-hover">
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: kpi.color + "18" }}>
-                  <kpi.icon className={`w-5 h-5 ${kpi.pulse ? "animate-pulse" : ""}`} style={{ color: kpi.color }} />
+          ].map(kpi => (
+            <Card key={kpi.label} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: kpi.color + "18" }}>
+                    <kpi.icon className={`w-5 h-5 ${kpi.pulse ? "animate-pulse" : ""}`} style={{ color: kpi.color }} />
+                  </div>
+                  <TrendingUp className="w-4 h-4 text-muted-foreground/40" />
                 </div>
-                <TrendingUp className="w-4 h-4 text-slate-300" />
-              </div>
-              <p className="text-3xl font-extrabold text-slate-900">{kpi.value}</p>
-              <p className="text-sm font-medium text-slate-500 mt-0.5">{kpi.label}</p>
-              <p className="text-xs text-slate-400">{kpi.sub}</p>
-            </div>
+                <p className="text-3xl font-extrabold">{kpi.value}</p>
+                <p className="text-sm font-medium text-muted-foreground mt-0.5">{kpi.label}</p>
+                <p className="text-xs text-muted-foreground/70">{kpi.sub}</p>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
         {/* Critical Alert Banner */}
         {criticalAlerts.length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-5">
-            <div className="flex items-center gap-2 mb-3">
-              <AlertCircle className="w-5 h-5 text-red-600 animate-pulse" />
-              <span className="font-bold text-red-800">
-                {criticalAlerts.length} Critical Alert{criticalAlerts.length > 1 ? "s" : ""} Require Immediate Attention
-              </span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-              {criticalAlerts.slice(0, 3).map((alert) => (
-                <div key={alert.id} className="bg-white border border-red-100 rounded-xl p-3">
-                  <p className="text-xs font-bold text-red-700">{alert.patientName} · {alert.patientId}</p>
-                  <p className="text-xs text-slate-600 mt-1">{alert.message}</p>
-                  {alert.vitals && <p className="text-xs text-red-500 font-medium mt-1">{alert.vitals}</p>}
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs text-slate-400 flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {alert.timestamp}
-                    </span>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4 animate-pulse" />
+            <AlertDescription>
+              <p className="font-bold mb-2">{criticalAlerts.length} Critical Alert{criticalAlerts.length > 1 ? "s" : ""} — Immediate Attention Required</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                {criticalAlerts.slice(0, 3).map(alert => (
+                  <div key={alert.id} className="bg-white/10 rounded-lg p-2.5 text-xs">
+                    <p className="font-bold">{alert.patientName} · {alert.patientId}</p>
+                    <p className="mt-0.5 opacity-90">{alert.message}</p>
+                    {alert.vitals && <p className="mt-0.5 font-medium">{alert.vitals}</p>}
+                    <p className="mt-1 opacity-60 flex items-center gap-1"><Clock className="w-3 h-3" />{alert.timestamp}</p>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Main grid: patient list + detail + charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* Patient Roster (left) */}
-          <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col" style={{ maxHeight: "75vh" }}>
-            <div className="p-4 border-b border-slate-100">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-slate-900">Patient Roster</h2>
-                <span className="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-lg border border-slate-200">
-                  {filteredPatients.length}/{patientRoster.length}
-                </span>
-              </div>
-              {/* Search */}
-              <div className="relative mb-2">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search patients..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
-                />
-              </div>
-              {/* Risk filter */}
-              <div className="flex gap-1">
-                {(["all", "high", "moderate", "low"] as const).map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => setRiskFilter(r)}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      riskFilter === r
-                        ? r === "all"
-                          ? "bg-slate-800 text-white"
-                          : r === "high"
-                          ? "bg-red-600 text-white"
-                          : r === "moderate"
-                          ? "bg-amber-500 text-white"
-                          : "bg-emerald-500 text-white"
-                        : "bg-slate-50 text-slate-500 hover:bg-slate-100"
-                    }`}
-                  >
-                    {r.charAt(0).toUpperCase() + r.slice(1)}
-                  </button>
                 ))}
               </div>
-            </div>
+            </AlertDescription>
+          </Alert>
+        )}
 
-            {/* Patient list */}
-            <div className="overflow-y-auto flex-1">
-              {filteredPatients.map((patient) => (
-                <button
-                  key={patient.id}
-                  onClick={() => setSelectedPatient(patient)}
-                  className={`w-full text-left px-4 py-3.5 border-b border-slate-50 hover:bg-blue-50/50 transition-colors ${
-                    selectedPatient?.id === patient.id ? "bg-blue-50 border-l-4 border-l-blue-500" : ""
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-8 h-8 rounded-full text-white text-xs font-bold flex items-center justify-center"
-                        style={{ backgroundColor: getRiskColor(patient.riskLevel) }}
-                      >
-                        {patient.name.split(" ").map((n) => n[0]).join("")}
-                      </div>
+        {/* Main grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Patient Roster */}
+          <Card className="flex flex-col" style={{ maxHeight: "78vh" }}>
+            <CardHeader className="pb-3 shrink-0">
+              <div className="flex items-center justify-between">
+                <CardTitle>Patient Roster</CardTitle>
+                <Badge variant="secondary">{filteredPatients.length}/{patientRoster.length}</Badge>
+              </div>
+              <div className="relative mt-2">
+                <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <Input placeholder="Search patients..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-8 h-9 text-sm" />
+              </div>
+              <div className="flex gap-1 mt-2">
+                {(["all", "high", "moderate", "low"] as const).map(r => (
+                  <Button key={r} size="sm"
+                    variant={riskFilter === r ? "default" : "ghost"}
+                    className={`flex-1 h-7 text-xs ${riskFilter === r && r === "high" ? "bg-destructive hover:bg-destructive/90" : riskFilter === r && r === "moderate" ? "bg-amber-500 hover:bg-amber-600" : riskFilter === r && r === "low" ? "bg-emerald-500 hover:bg-emerald-600" : ""}`}
+                    onClick={() => setRiskFilter(r)}>
+                    {r.charAt(0).toUpperCase() + r.slice(1)}
+                  </Button>
+                ))}
+              </div>
+            </CardHeader>
+            <ScrollArea className="flex-1 overflow-y-auto">
+              {filteredPatients.map(patient => (
+                <button key={patient.id} onClick={() => setSelectedPatient(patient)}
+                  className={`w-full text-left px-4 py-3 border-b border-border/50 hover:bg-muted/50 transition-colors ${selectedPatient?.id === patient.id ? "bg-primary/5 border-l-4 border-l-primary" : ""}`}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2.5">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="text-white text-xs font-bold" style={{ backgroundColor: getRiskColor(patient.riskLevel) }}>
+                          {patient.name.split(" ").map(n => n[0]).join("")}
+                        </AvatarFallback>
+                      </Avatar>
                       <div>
-                        <p className="text-sm font-semibold text-slate-900 leading-tight">{patient.name}</p>
-                        <p className="text-xs text-slate-400">{patient.age}y · {patient.id}</p>
+                        <p className="text-sm font-semibold leading-tight">{patient.name}</p>
+                        <p className="text-xs text-muted-foreground">{patient.age}y · {patient.id}</p>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <ScoreBadge score={patient.healthScore} />
-                      <AlertCount alerts={patient.alerts} />
+                      <ScorePill score={patient.healthScore} />
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-1 mt-1.5 pl-10">
-                    {patient.condition.map((c) => (
-                      <span key={c} className="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md">{c}</span>
-                    ))}
+                  <div className="flex flex-wrap gap-1 pl-[42px]">
+                    {patient.condition.map(c => <Badge key={c} variant="secondary" className="text-xs py-0">{c}</Badge>)}
+                    {patient.alerts.filter(a => !a.resolved && a.type === "critical").length > 0 && (
+                      <Badge variant="danger" className="text-xs py-0 animate-pulse">
+                        {patient.alerts.filter(a => !a.resolved && a.type === "critical").length} critical
+                      </Badge>
+                    )}
                   </div>
                 </button>
               ))}
-            </div>
-          </div>
+            </ScrollArea>
+          </Card>
 
-          {/* Right side: detail or charts */}
-          <div className="lg:col-span-2 flex flex-col gap-5">
+          {/* Right panel */}
+          <div className="lg:col-span-2 space-y-5">
             {selectedPatient ? (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5" style={{ minHeight: "75vh" }}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-sm font-semibold text-slate-900">Patient Detail</h2>
-                  <button
-                    onClick={() => setSelectedPatient(null)}
-                    className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1"
-                  >
-                    <XCircle className="w-3.5 h-3.5" /> Close
-                  </button>
-                </div>
-                <PatientDetailPanel patient={selectedPatient} />
-              </div>
+              <Card>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Patient Detail</CardTitle>
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedPatient(null)} className="text-muted-foreground">
+                      <XCircle className="w-4 h-4 mr-1" /> Close
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent><PatientDetail patient={selectedPatient} /></CardContent>
+              </Card>
             ) : (
               <>
-                {/* Charts row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {/* Risk Distribution */}
-                  <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-                    <h3 className="text-sm font-semibold text-slate-900 mb-4">Risk Distribution</h3>
-                    <ResponsiveContainer width="100%" height={160}>
-                      <PieChart>
-                        <Pie
-                          data={populationRiskDistribution}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={45}
-                          outerRadius={65}
-                          paddingAngle={4}
-                          dataKey="value"
-                        >
-                          {populationRiskDistribution.map((entry, i) => (
-                            <Cell key={i} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(v: number) => [v, "Patients"]} contentStyle={{ borderRadius: "12px", border: "none", fontSize: "11px" }} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="space-y-2 mt-2">
-                      {populationRiskDistribution.map((d) => (
-                        <div key={d.name} className="flex items-center justify-between text-xs">
-                          <span className="flex items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                            <span className="text-slate-600">{d.name}</span>
-                          </span>
-                          <span className="font-semibold text-slate-800">{d.value} pts ({d.percentage}%)</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle>Risk Distribution</CardTitle>
+                      <CardDescription>{patientRoster.length} patients</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={160}>
+                        <PieChart>
+                          <Pie data={populationRiskDistribution} cx="50%" cy="50%" innerRadius={45} outerRadius={65} paddingAngle={4} dataKey="value">
+                            {populationRiskDistribution.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                          </Pie>
+                          <Tooltip formatter={(v: number) => [v, "Patients"]} contentStyle={{ borderRadius: "10px", border: "1px solid hsl(var(--border))", fontSize: "11px" }} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="space-y-2 mt-2">
+                        {populationRiskDistribution.map(d => (
+                          <div key={d.name} className="flex items-center justify-between text-xs">
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+                              <span className="text-muted-foreground">{d.name}</span>
+                            </span>
+                            <span className="font-semibold">{d.value} ({d.percentage}%)</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
 
                   {/* Alert Trend */}
-                  <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-                    <h3 className="text-sm font-semibold text-slate-900 mb-4">Weekly Alert Trend</h3>
-                    <ResponsiveContainer width="100%" height={160}>
-                      <BarChart data={alertTrend} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                        <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                        <Tooltip contentStyle={{ borderRadius: "12px", border: "none", fontSize: "11px" }} />
-                        <Bar dataKey="critical" name="Critical" stackId="a" fill="#ef4444" radius={[0,0,4,4]} />
-                        <Bar dataKey="warning" name="Warning" stackId="a" fill="#f59e0b" radius={[4,4,0,0]} />
-                        <Legend wrapperStyle={{ fontSize: "11px" }} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle>Weekly Alert Trend</CardTitle>
+                      <CardDescription>Critical vs warning alerts</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={160}>
+                        <BarChart data={alertTrend} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                          <XAxis dataKey="day" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                          <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                          <Tooltip contentStyle={{ borderRadius: "10px", border: "1px solid hsl(var(--border))", fontSize: "11px" }} />
+                          <Bar dataKey="critical" name="Critical" stackId="a" fill="#ef4444" radius={[0,0,4,4]} />
+                          <Bar dataKey="warning" name="Warning" stackId="a" fill="#f59e0b" radius={[4,4,0,0]} />
+                          <Legend wrapperStyle={{ fontSize: "11px" }} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
                 </div>
 
                 {/* All Alerts Table */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-semibold text-slate-900">All Active Alerts</h3>
-                    <div className="flex gap-2">
-                      <button className="text-xs text-slate-500 flex items-center gap-1 hover:text-slate-700">
-                        <Filter className="w-3 h-3" /> Filter
-                      </button>
-                      <button className="text-xs text-blue-600 flex items-center gap-1 hover:text-blue-700">
-                        <Download className="w-3 h-3" /> Export
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {allAlerts.map((alert) => (
-                      <div
-                        key={alert.id}
-                        className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer hover:opacity-90 transition-opacity ${
-                          alert.type === "critical"
-                            ? "bg-red-50 border-red-200"
-                            : alert.type === "warning"
-                            ? "bg-amber-50 border-amber-200"
-                            : "bg-blue-50 border-blue-200"
-                        }`}
-                        onClick={() => setSelectedPatient(patientRoster.find((p) => p.id === alert.patientId) ?? null)}
-                      >
-                        <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
-                          alert.type === "critical" ? "bg-red-500 animate-pulse" : alert.type === "warning" ? "bg-amber-500" : "bg-blue-500"
-                        }`} />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <span className="text-xs font-bold text-slate-700">{alert.patientName}</span>
-                            <span className="text-xs text-slate-400">{alert.patientId}</span>
-                          </div>
-                          <p className="text-xs text-slate-600">{alert.message}</p>
-                          {alert.vitals && <p className="text-xs font-medium text-red-500 mt-0.5">{alert.vitals}</p>}
-                        </div>
-                        <div className="flex flex-col items-end gap-1 shrink-0">
-                          <span className="text-xs text-slate-400">{alert.timestamp}</span>
-                          <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-                        </div>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>All Active Alerts</CardTitle>
+                        <CardDescription>Click a row to view patient detail</CardDescription>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm"><Filter className="w-3.5 h-3.5 mr-1" />Filter</Button>
+                        <Button variant="outline" size="sm"><Download className="w-3.5 h-3.5 mr-1" />Export</Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <ScrollArea className="max-h-64">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Severity</TableHead>
+                            <TableHead>Patient</TableHead>
+                            <TableHead>Alert</TableHead>
+                            <TableHead>Vitals</TableHead>
+                            <TableHead>Time</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {allAlerts.map(alert => (
+                            <TableRow key={alert.id} className="cursor-pointer"
+                              onClick={() => setSelectedPatient(patientRoster.find(p => p.id === alert.patientId) ?? null)}>
+                              <TableCell>
+                                <Badge variant={alert.type === "critical" ? "danger" : alert.type === "warning" ? "warning" : "info"}>
+                                  {alert.type}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="font-medium text-xs">{alert.patientName}<br /><span className="text-muted-foreground">{alert.patientId}</span></TableCell>
+                              <TableCell className="text-xs max-w-[200px]">{alert.message}</TableCell>
+                              <TableCell className="text-xs text-destructive font-medium">{alert.vitals ?? "—"}</TableCell>
+                              <TableCell className="text-xs text-muted-foreground">{alert.timestamp}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
               </>
             )}
           </div>
         </div>
 
-        <footer className="text-center py-5 text-xs text-slate-400 mt-4">
-          JIVA APHP · Healthcare Provider Dashboard · HIPAA Aligned · FHIR Compatible · Role-Based Access Control
-        </footer>
+        <p className="text-center text-xs text-muted-foreground pb-4">
+          JIVA APHP · Provider Dashboard · HIPAA Aligned · FHIR Compatible · Role-Based Access Control
+        </p>
       </main>
     </div>
   );
