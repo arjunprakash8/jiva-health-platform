@@ -1,0 +1,45 @@
+{
+  "name": "JIVA Health Platform",
+  "short_name": "JIVA",
+  "description": "AI-Powered Pro-Active Healthcare — Smart Health Ring Dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d9488",
+  "orientation": "portrait-primary",
+  "categories": ["health", "medical"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Patient Dashboard",
+      "short_name": "Patient",
+      "url": "/patient",
+      "description": "View your health metrics"
+    },
+    {
+      "name": "Provider Dashboard",
+      "short_name": "Provider",
+      "url": "/provider",
+      "description": "Manage your patient cohort"
+    },
+    {
+      "name": "Insurer Dashboard",
+      "short_name": "Insurer",
+      "url": "/insurer",
+      "description": "View pilot analytics"
+    }
+  ]
+}

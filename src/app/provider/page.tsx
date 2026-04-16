@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import ExecutionFramework from "@/components/ExecutionFramework";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell, Legend,
@@ -156,6 +157,7 @@ export default function ProviderDashboard() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [riskFilter, setRiskFilter] = useState<"all" | "high" | "moderate" | "low">("all");
+  const [activeTab, setActiveTab] = useState<"monitoring" | "execution">("monitoring");
 
   const allAlerts = patientRoster.flatMap(p =>
     p.alerts.filter(a => !a.resolved).map(a => ({ ...a, patientName: p.name, patientId: p.id }))
@@ -259,7 +261,25 @@ export default function ProviderDashboard() {
           </Alert>
         )}
 
-        {/* Main grid */}
+        {/* Tab Bar */}
+        <div className="flex gap-1 border-b border-border">
+          {(["monitoring", "execution"] as const).map(tab => (
+            <button key={tab} onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2.5 text-sm font-semibold capitalize transition-colors border-b-2 -mb-px ${
+                activeTab === tab
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}>
+              {tab === "monitoring" ? "Patient Monitoring" : "Execution Framework"}
+            </button>
+          ))}
+        </div>
+
+        {/* Execution Framework Tab */}
+        {activeTab === "execution" && <ExecutionFramework />}
+
+        {/* Monitoring Tab */}
+        {activeTab === "monitoring" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {/* Patient Roster */}
           <Card className="flex flex-col" style={{ maxHeight: "78vh" }}>
@@ -434,6 +454,7 @@ export default function ProviderDashboard() {
             )}
           </div>
         </div>
+        )}
 
         <p className="text-center text-xs text-muted-foreground pb-4">
           JIVA APHP · Provider Dashboard · HIPAA Aligned · FHIR Compatible · Role-Based Access Control

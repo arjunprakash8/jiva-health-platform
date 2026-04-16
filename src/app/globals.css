@@ -82,3 +82,30 @@
 ::-webkit-scrollbar-track { @apply bg-muted rounded-full; }
 ::-webkit-scrollbar-thumb { @apply bg-border rounded-full; }
 ::-webkit-scrollbar-thumb:hover { @apply bg-muted-foreground/40; }
+
+/* ── Mobile / PWA ─────────────────────────────────────────────────────────── */
+
+/* Prevent text size inflate on rotation */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* Safe area insets for notched phones */
+body {
+  padding-env: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Minimum touch target */
+button, a, [role="button"] {
+  touch-action: manipulation;
+  min-height: 44px;
+}
+
+/* Full-bleed on very small screens */
+@media (max-width: 375px) {
+  .max-w-\[1400px\] { padding-left: 12px; padding-right: 12px; }
+}
+
+/* PWA standalone — hide browser chrome artefacts */
+@media (display-mode: standalone) {
+  nav.sticky { padding-top: env(safe-area-inset-top, 0px); }
+}
