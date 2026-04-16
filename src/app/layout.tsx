@@ -3,8 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "JIVA — AI-Powered Pro-Active Healthcare",
-  description: "JIVA APHP: Smart Health Ring platform with patient, provider, and insurer dashboards powered by AI analytics.",
-  keywords: "JIVA, health ring, wearable, ECG, PPG, HRV, SpO2, AI healthcare",
+  description: "JIVA APHP: Smart Health Band platform with patient, provider, and insurer dashboards powered by AI analytics.",
+  keywords: "JIVA, health band, wearable, ECG, PPG, HRV, SpO2, AI healthcare",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

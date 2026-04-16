@@ -1,5 +1,5 @@
 // ─── JIVA Mock Data Library ───────────────────────────────────────────────────
-// Simulates data that would be streamed from the JIVA Smart Health Ring
+// Simulates data that would be streamed from the JIVA Smart Health Band
 
 export type RiskLevel = "high" | "moderate" | "low";
 export type Tier = "Bronze" | "Silver" | "Gold" | "Platinum" | "Diamond";
@@ -26,7 +26,7 @@ export interface Patient {
   steps: number;
   sleepScore: number;
   lastSync: string;
-  ringBattery: number;
+  bandBattery: number;
   activityCompliance: number;
   incentiveMultiplier: number;
   inactivityPenalty: number;
@@ -137,7 +137,7 @@ export const currentPatient: Patient = {
   steps: 9240,
   sleepScore: 82,
   lastSync: "2 min ago",
-  ringBattery: 68,
+  bandBattery: 68,
   activityCompliance: 85,
   incentiveMultiplier: 1.15,
   inactivityPenalty: 0,
@@ -184,7 +184,7 @@ export const patientRoster: Patient[] = [
     steps: 2340,
     sleepScore: 51,
     lastSync: "5 min ago",
-    ringBattery: 45,
+    bandBattery: 45,
     activityCompliance: 28,
     incentiveMultiplier: 1.0,
     inactivityPenalty: 120,
@@ -224,7 +224,7 @@ export const patientRoster: Patient[] = [
     steps: 5670,
     sleepScore: 64,
     lastSync: "12 min ago",
-    ringBattery: 72,
+    bandBattery: 72,
     activityCompliance: 55,
     incentiveMultiplier: 1.1,
     inactivityPenalty: 40,
@@ -256,7 +256,7 @@ export const patientRoster: Patient[] = [
     steps: 1890,
     sleepScore: 44,
     lastSync: "3 min ago",
-    ringBattery: 31,
+    bandBattery: 31,
     activityCompliance: 18,
     incentiveMultiplier: 1.0,
     inactivityPenalty: 200,
@@ -295,7 +295,7 @@ export const patientRoster: Patient[] = [
     steps: 13450,
     sleepScore: 91,
     lastSync: "8 min ago",
-    ringBattery: 88,
+    bandBattery: 88,
     activityCompliance: 94,
     incentiveMultiplier: 1.2,
     inactivityPenalty: 0,
@@ -318,7 +318,7 @@ export const patientRoster: Patient[] = [
     steps: 6890,
     sleepScore: 72,
     lastSync: "21 min ago",
-    ringBattery: 54,
+    bandBattery: 54,
     activityCompliance: 62,
     incentiveMultiplier: 1.1,
     inactivityPenalty: 20,
@@ -349,7 +349,7 @@ export const patientRoster: Patient[] = [
     steps: 18200,
     sleepScore: 94,
     lastSync: "1 min ago",
-    ringBattery: 92,
+    bandBattery: 92,
     activityCompliance: 98,
     incentiveMultiplier: 1.25,
     inactivityPenalty: 0,
@@ -372,7 +372,7 @@ export const patientRoster: Patient[] = [
     steps: 3120,
     sleepScore: 55,
     lastSync: "7 min ago",
-    ringBattery: 41,
+    bandBattery: 41,
     activityCompliance: 35,
     incentiveMultiplier: 1.0,
     inactivityPenalty: 150,
@@ -404,7 +404,7 @@ export const patientRoster: Patient[] = [
     steps: 9870,
     sleepScore: 78,
     lastSync: "15 min ago",
-    ringBattery: 67,
+    bandBattery: 67,
     activityCompliance: 79,
     incentiveMultiplier: 1.15,
     inactivityPenalty: 0,

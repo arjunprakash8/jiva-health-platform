@@ -94,7 +94,7 @@ function PatientDetail({ patient }: { patient: Patient }) {
           {[
             { label: "Health Score", val: patient.healthScore, color: getScoreColor(patient.healthScore) },
             { label: "Compliance", val: `${patient.activityCompliance}%`, color: "white" },
-            { label: "Battery", val: `${patient.ringBattery}%`, color: "white" },
+            { label: "Battery", val: `${patient.bandBattery}%`, color: "white" },
           ].map((s, i) => (
             <div key={i} className="text-center">
               <p className="text-2xl font-extrabold" style={{ color: typeof s.color === "string" ? s.color : "#fff" }}>{s.val}</p>

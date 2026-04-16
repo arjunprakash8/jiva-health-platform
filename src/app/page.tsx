@@ -12,7 +12,7 @@ const roles = [
     id: "patient",
     title: "Patient",
     subtitle: "Personal Health Dashboard",
-    description: "Monitor real-time vitals, track your AI Health Score, earn Status Points, and receive proactive health insights from your JIVA Smart Ring.",
+    description: "Monitor real-time vitals, track your AI Health Score, earn Status Points, and receive proactive health insights from your JIVA Smart Band.",
     icon: Heart,
     href: "/patient",
     gradient: "from-emerald-500 to-teal-600",
@@ -99,7 +99,7 @@ export default function LandingPage() {
           </span>
         </h1>
         <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-          The JIVA Smart Health Ring continuously monitors ECG, PPG, HRV, SpO₂, temperature, and bio-impedance — delivering clinical-grade insights to patients, providers, and insurers.
+          The JIVA Smart Health Band continuously monitors ECG, PPG, HRV, SpO₂, temperature, and bio-impedance — delivering clinical-grade insights to patients, providers, and insurers.
         </p>
 
         {/* Stats */}

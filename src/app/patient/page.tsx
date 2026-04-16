@@ -207,8 +207,8 @@ export default function PatientDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />Ring Connected</span>
-              <span className="flex items-center gap-1.5"><Battery className="w-3.5 h-3.5 text-emerald-500" />{p.ringBattery}%</span>
+              <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />Band Connected</span>
+              <span className="flex items-center gap-1.5"><Battery className="w-3.5 h-3.5 text-emerald-500" />{p.bandBattery}%</span>
               <span className="flex items-center gap-1.5"><RefreshCw className="w-3 h-3" />{p.lastSync}</span>
             </div>
             <Button variant="ghost" size="icon" className="relative">
@@ -238,14 +238,14 @@ export default function PatientDashboard() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">Good morning, {p.name.split(" ")[0]} 👋</h1>
             <p className="text-muted-foreground text-sm mt-0.5">
-              {new Date().toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long" })} · JIVA Ring Active
+              {new Date().toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long" })} · JIVA Band Active
             </p>
           </div>
           <Card className="border-border/60">
             <CardContent className="py-2.5 px-4 flex items-center gap-3 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5"><Wifi className="w-3.5 h-3.5 text-emerald-500" />BLE 5.0 · Real-time</span>
               <Separator orientation="vertical" className="h-4" />
-              <span className="flex items-center gap-1.5"><Battery className="w-3.5 h-3.5 text-emerald-500" />{p.ringBattery}%</span>
+              <span className="flex items-center gap-1.5"><Battery className="w-3.5 h-3.5 text-emerald-500" />{p.bandBattery}%</span>
               <Separator orientation="vertical" className="h-4" />
               <span className="flex items-center gap-1.5"><RefreshCw className="w-3 h-3" />Synced {p.lastSync}</span>
             </CardContent>

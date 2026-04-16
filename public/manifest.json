@@ -1,7 +1,7 @@
 {
   "name": "JIVA Health Platform",
   "short_name": "JIVA",
-  "description": "AI-Powered Pro-Active Healthcare — Smart Health Ring Dashboard",
+  "description": "AI-Powered Pro-Active Healthcare — Smart Health Band Dashboard",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

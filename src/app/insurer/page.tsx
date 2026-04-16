@@ -434,7 +434,7 @@ export default function InsurerDashboard() {
                       <code className="text-xs block bg-amber-100 rounded px-2 py-1.5 mb-2">
                         Status Points = (Activity × Incentive Multiplier) − Inactivity Penalty
                       </code>
-                      {["Bronze (0–999): standard premium", "Silver (1000–2499): 5% cashback", "Gold (2500–4999): 10% cashback", "Platinum (5000–7499): 12% cashback", "Diamond (7500+): 15% cashback + free ring"].map(t => (
+                      {["Bronze (0–999): standard premium", "Silver (1000–2499): 5% cashback", "Gold (2500–4999): 10% cashback", "Platinum (5000–7499): 12% cashback", "Diamond (7500+): 15% cashback + free band"].map(t => (
                         <p key={t} className="text-xs">• {t}</p>
                       ))}
                     </AlertDescription>
