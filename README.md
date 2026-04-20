@@ -1,6 +1,6 @@
 # JIVA — AI-Powered Pro-Active Healthcare Program (APHP)
 
-MVP web platform complementing the JIVA Smart Health Ring wearable.
+MVP web platform complementing the JIVA Smart Health Band wearable.
 
 ## Dashboards
 
