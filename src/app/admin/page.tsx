@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import DashboardShell from "@/components/layout/DashboardShell";
 import AdminPanel from "@/components/admin/AdminPanel";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Overview", id: "overview" },
@@ -21,19 +22,22 @@ export default function AdminPage() {
   const [activeSection, setActiveSection] = useState("overview");
 
   return (
-    <DashboardShell
-      navItems={navItems}
-      activeSection={activeSection}
-      onSectionChange={setActiveSection}
-      role="insurer"
-      userName="Admin"
-      userInitials="AD"
-      userSub="Platform Administrator"
-      notificationCount={5}
-      topBarTitle="Admin Dashboard"
-      topBarSub="Platform management and oversight"
-    >
-      <AdminPanel />
-    </DashboardShell>
+    <>
+      <DashboardShell
+        navItems={navItems}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        role="admin"
+        userName="Admin"
+        userInitials="AD"
+        userSub="Platform Administrator"
+        notificationCount={5}
+        topBarTitle={navItems.find(n => n.id === activeSection)?.label ?? "Admin"}
+        topBarSub="Platform management and oversight"
+      >
+        <AdminPanel activeSection={activeSection} />
+      </DashboardShell>
+      <MobileBottomNav navItems={navItems} activeSection={activeSection} onSectionChange={setActiveSection} />
+    </>
   );
 }
