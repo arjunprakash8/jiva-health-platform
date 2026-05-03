@@ -7,7 +7,7 @@ import {
   Sparkles, Star, Timer, TrendingUp, Wind, Flame
 } from "lucide-react";
 import DashboardShell, { NavItem } from "@/components/layout/DashboardShell";
-import MetricCard from "@/components/ui/metric-card";
+// MetricCard not used in this page (sections use inline stat cards)
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import PerformanceSphere from "@/components/wellness/PerformanceSphere";
 import GPSMap from "@/components/wellness/GPSMap";
@@ -464,9 +464,9 @@ export default function PatientDashboard() {
 
       {/* Mobile bottom nav */}
       <MobileBottomNav
-        items={MOBILE_NAV}
-        activeId={activeSection}
-        onChange={setActiveSection}
+        navItems={MOBILE_NAV}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
       />
     </>
   );

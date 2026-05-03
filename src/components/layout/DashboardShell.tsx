@@ -18,7 +18,7 @@ export interface DashboardShellProps {
   navItems: NavItem[];
   activeSection: string;
   onSectionChange: (id: string) => void;
-  role: "patient" | "provider" | "insurer";
+  role: "patient" | "provider" | "insurer" | "admin";
   userName: string;
   userInitials: string;
   userSub: string;
@@ -32,12 +32,14 @@ const roleGradients: Record<string, string> = {
   patient: "from-[#14b8a6] to-[#6366f1]",
   provider: "from-[#3b82f6] to-[#6366f1]",
   insurer: "from-[#8b5cf6] to-[#6366f1]",
+  admin: "from-[#f59e0b] to-[#6366f1]",
 };
 
 const roleLabels: Record<string, string> = {
   patient: "Patient Portal",
   provider: "Provider Portal",
   insurer: "Insurer Portal",
+  admin: "Admin Portal",
 };
 
 export default function DashboardShell({
