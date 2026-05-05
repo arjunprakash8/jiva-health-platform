@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   Activity, Zap, Heart, Moon, BarChart2, Navigation,
   Apple, Dumbbell, Battery, Droplets, Brain, Target,
-  Sparkles, Star, Timer, TrendingUp, Wind, Flame
+  Sparkles, Star, Timer, TrendingUp, Wind, Flame, Edit3
 } from "lucide-react";
 import DashboardShell, { NavItem } from "@/components/layout/DashboardShell";
 // MetricCard not used in this page (sections use inline stat cards)
@@ -12,6 +12,7 @@ import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import PerformanceSphere from "@/components/wellness/PerformanceSphere";
 import GPSMap from "@/components/wellness/GPSMap";
 import WorkoutLogger from "@/components/wellness/WorkoutLogger";
+import ActivityEditor from "@/components/wellness/ActivityEditor";
 import NutritionLogger from "@/components/wellness/NutritionLogger";
 import RecoveryPanel from "@/components/wellness/RecoveryPanel";
 import HydrationTracker from "@/components/wellness/HydrationTracker";
@@ -66,6 +67,7 @@ const NAV_ITEMS: NavItem[] = [
   { icon: Navigation, label: "GPS & Routes", id: "gps" },
   { icon: Apple, label: "Nutrition", id: "nutrition" },
   { icon: Dumbbell, label: "Workout", id: "workout" },
+  { icon: Edit3, label: "Edit Activity", id: "edit-activity" },
   { icon: Battery, label: "Recovery", id: "recovery" },
   { icon: Droplets, label: "Hydration", id: "hydration" },
   { icon: Brain, label: "Mindfulness", id: "mindfulness" },
@@ -428,6 +430,7 @@ export default function PatientDashboard() {
       case "gps":          return <GPSMap />;
       case "nutrition":    return <NutritionLogger />;
       case "workout":      return <WorkoutLogger />;
+      case "edit-activity": return <ActivityEditor onBack={() => setActiveSection("workout")} />;
       case "recovery":     return <RecoveryPanel />;
       case "hydration":    return <HydrationTracker />;
       case "mindfulness":  return <MindfulnessModule />;
